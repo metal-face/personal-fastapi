@@ -1,5 +1,5 @@
 from typing import Any
-from fastapi.responses import JSONResponse
+from server.json import OrJSONResponse
 
 
 def success(
@@ -12,7 +12,7 @@ def success(
         "content": content,
         "meta": meta,
     }
-    return JSONResponse(
+    return OrJSONResponse(
         content=data,
         status_code=status_code,
     )
@@ -26,7 +26,7 @@ def failure(
         "status": "error",
         "content": content,
     }
-    return JSONResponse(
+    return OrJSONResponse(
         content=data,
         status_code=status_code,
     )

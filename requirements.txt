@@ -3,3 +3,4 @@ databases
 fastapi
 python-dotenv
 uvicorn
+orjson
