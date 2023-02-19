@@ -4,6 +4,8 @@ from server.repositories import accounts
 
 router = APIRouter()
 
+
 @router.post("/accounts")
 async def create_account(args: AccountDTO):
-    accounts.create_account()
+    account = await accounts.create_account(args.username, args.email, args.password)
+    return account
