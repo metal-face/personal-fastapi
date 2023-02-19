@@ -1,6 +1,0 @@
-{
-    "editor.formatOnSave": true,
-    "files.autoSave": "afterDelay",
-    "python.formatting.provider": "black",
-    "python.analysis.typeCheckingMode": "basic"
-}
