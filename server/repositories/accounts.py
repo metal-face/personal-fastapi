@@ -20,17 +20,23 @@ async def create_account(username: str, email: str, password: str) -> dict[str, 
         },
     )
     assert account is not None
-    return dict(account._mapping)
+    return dict(account._mapping.items())
 
 
-async def get_all_accounts() -> list[dict[str, Any]]:
+async def get_many_accounts(page: int, page_size: int) -> list[dict[str, Any]]:
     accounts = await services.database.fetch_all(
         query=f"""
             SELECT {READ_PARAMS} 
             FROM accounts
+            LIMIT :limit
+            OFFSET :offset
         """,
+        values={
+            "limit": page_size,
+            "offset": (page - 1) * page_size,
+        },
     )
-    return [dict(account) for account in accounts]
+    return [dict(account._mapping) for account in accounts]
 
 
 async def get_account_by_id(id: UUID) -> Union[dict[str, Any], None]:
@@ -39,6 +45,45 @@ async def get_account_by_id(id: UUID) -> Union[dict[str, Any], None]:
             SELECT {READ_PARAMS} 
             FROM accounts 
             WHERE id = :id
+        """,
+        values={
+            "id": id,
+        },
+    )
+    return dict(account._mapping) if account is not None else None
+
+
+async def update_account_by_id(
+    id: UUID,
+    username: str | None,
+    email: str | None,
+    password: str | None,
+) -> dict[str, Any] | None:
+    account = await services.database.fetch_one(
+        query=f"""
+            UPDATE accounts
+            SET username = COALESCE(:username, username),
+            email = COALESCE(:email, email),
+            password = COALESCE(:password, password)
+            WHERE id = :id
+            RETURNING ({READ_PARAMS})
+        """,
+        values={
+            "id": id,
+            "username": username,
+            "email": email,
+            "password": password,
+        },
+    )
+    return dict(account) if account is not None else None
+
+
+async def delete_account_by_id(id: UUID) -> Union[dict[str, Any], None]:
+    account = await services.database.fetch_one(
+        query=f"""
+            DELETE FROM accounts
+            WHERE id = :id
+            RETURNING ({READ_PARAMS})
         """,
         values={
             "id": id,
