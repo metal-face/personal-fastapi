@@ -1,8 +1,12 @@
+#!/usr/bin/env python3
 from fastapi import FastAPI
 from databases import Database
+from server import services
 from server.controllers.accounts import router
 from server import settings
 from server.adapters import database
+
+import uvicorn
 
 app = FastAPI()
 app.include_router(router)
@@ -10,7 +14,7 @@ app.include_router(router)
 
 @app.on_event("startup")
 async def start_database():
-    app.state.database = Database(
+    services.database = Database(
         database.dsn(
             driver=settings.DB_DRIVER,
             user=settings.DB_USER,
@@ -20,9 +24,13 @@ async def start_database():
             database=settings.DB_NAME,
         ),
     )
-    await app.state.database.connect()
+    await services.database.connect()
 
 
 @app.on_event("shutdown")
 async def stop_database():
-    await app.state.database.disconnect()
+    await services.database.disconnect()
+
+
+if __name__ == "__main__":
+    uvicorn.run("main:app")
