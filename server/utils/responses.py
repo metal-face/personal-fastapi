@@ -1,5 +1,5 @@
 from typing import Any
-from server.json import OrJSONResponse
+from server.utils.json import OrJSONResponse
 
 
 def success(
