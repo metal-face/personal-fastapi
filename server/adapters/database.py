@@ -5,6 +5,5 @@ def dsn(
     host: str,
     port: int,
     database: str,
-
 ) -> str:
     return f"{driver}://{user}:{password}@{host}:{port}/{database}"
