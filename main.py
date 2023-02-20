@@ -5,6 +5,7 @@ from server import services
 from server.controllers.accounts import router
 from server import settings
 from server.adapters import database
+from aioredis import Redis
 
 import uvicorn
 
@@ -30,6 +31,21 @@ async def start_database():
 @app.on_event("shutdown")
 async def stop_database():
     await services.database.disconnect()
+
+
+@app.on_event("startup")
+async def start_redis():
+    services.redis = Redis(
+        host=settings.REDIS_HOST,
+        port=settings.REDIS_PORT,
+        db=settings.REDIS_DB,
+    )
+    await services.redis.initialize()
+
+
+@app.on_event("shutdown")
+async def stop_redis():
+    await services.redis.close()
 
 
 if __name__ == "__main__":
