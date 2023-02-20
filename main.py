@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 from fastapi import FastAPI
 from databases import Database
-from server import services
+from server.utils import services
 from server.controllers.accounts import router
-from server import settings
+from server.utils import settings
 from server.adapters import database
 from aioredis import Redis
 

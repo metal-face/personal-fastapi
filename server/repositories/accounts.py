@@ -1,7 +1,7 @@
 from typing import Any, Union
 from uuid import UUID
 
-from server import services
+from server.utils import services
 
 READ_PARAMS = "id, username, email, created_at"
 

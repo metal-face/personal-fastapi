@@ -2,7 +2,7 @@ from fastapi import APIRouter
 from server.models.dto.AccountDTO import AccountDTO
 from server.repositories import accounts
 from uuid import UUID
-from server import responses
+from server.utils import responses
 from server.models.dto.AccountDTO import AccountUpdateDTO
 
 router = APIRouter()
