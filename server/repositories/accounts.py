@@ -53,6 +53,30 @@ async def get_account_by_id(id: UUID) -> Union[dict[str, Any], None]:
     return dict(account._mapping) if account is not None else None
 
 
+async def get_account_by_email(email: str) -> Union[dict[str, Any], None]:
+    account = await services.database.fetch_one(
+        query=f"""
+            SELECT {READ_PARAMS}
+            FROM accounts
+            WHERE email = :email
+        """,
+        values={"email": email},
+    )
+    return dict(account._mapping) if account is not None else None
+
+
+async def get_account_by_username(username: str) -> Union[dict[str, Any], None]:
+    account = await services.database.fetch_one(
+        query=f"""
+            SELECT {READ_PARAMS}
+            FROM accounts
+            where username = :username
+        """,
+        values={"username": username},
+    )
+    return dict(account._mapping) if account is not None else None
+
+
 async def update_account_by_id(
     id: UUID,
     username: str | None,
