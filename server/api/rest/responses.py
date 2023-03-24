@@ -2,6 +2,7 @@ from typing import Any, TypeVar, TypedDict, Literal, Mapping, Iterable, Generic
 from server.utils.json import OrJSONResponse
 from server.utils.errors import ServiceError
 from pydantic.generics import GenericModel
+from pydantic import BaseModel
 
 
 T = TypeVar("T")
@@ -39,7 +40,12 @@ def create_response(
 class Success(GenericModel, Generic[T]):
     status: Literal["success"]
     data: T
-
+    
+class Failure(BaseModel):
+    status: Literal["failure"]
+    error: ServiceError
+    message: str
+    
 
 def format_success(data: Any) -> dict[str, Any]:
     return {"status": "success", "data": data}
@@ -50,14 +56,9 @@ def success(
     status_code: int = 200,
     headers: dict | None = None,
     cookies: Iterable[Cookie] | None = None,
-) -> OrJSONResponse:
+) -> Any:
     content = format_success(data)
     return create_response(content, status_code, headers, cookies)
-
-class Error(GenericModel, Generic[T]):
-    status: Literal["error"]
-    error: T
-    message: str
 
 
 def format_failure(error: ServiceError, message: str) -> dict[str, Any]:
@@ -70,6 +71,6 @@ def failure(
     headers: dict | None = None,
     cookies: Iterable[Cookie] | None = None,
     status_code: int = 400,
-) -> OrJSONResponse:
+) -> Any:
     content = format_failure(error, message)
     return create_response(content, status_code, headers, cookies)
