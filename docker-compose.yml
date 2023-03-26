@@ -1,0 +1,41 @@
+version: "3.3"
+
+services:
+
+  postgres: 
+    image:  postgres:13
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASS}
+    volumes:
+    - ./pgdata:/var/lib/postgresql/data
+    ports:
+    - 5432:5432
+
+  redis:  
+    image: redis
+    volumes:
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+    ports:
+      - 6379:6379
+
+
+  website-backend:
+    image: website-backend:latest
+    ports: 
+      - 10000:80
+    environment:
+      - DB_DRIVER=${DB_DRIVER}
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_NAME=${DB_NAME}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_DB=${REDIS_DB}
+    volumes:
+      - ./mount:/srv/root
+      - ./scripts:/scripts
+    depends_on:
+      - postgres
+      - redis
