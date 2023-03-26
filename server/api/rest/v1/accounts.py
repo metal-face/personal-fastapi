@@ -1,55 +1,64 @@
 from fastapi import APIRouter
 from server.models.dto.accounts import AccountDTO
-from server.repositories import accounts
+from server.services import accounts
 from uuid import UUID
 from server.api.rest import responses
 from server.models.dto.accounts import AccountUpdateDTO
+from server.utils.errors import ServiceError
 
 router = APIRouter()
 
 
 @router.post("/accounts")
 async def create_account(args: AccountDTO):
-    account = await accounts.create_account(args.username, args.email, args.password)
+    account = await accounts.signup(args.email, args.password, args.username,)
+    
+    if isinstance(account, ServiceError):
+        return responses.failure(account, message="Signup Failed!", status_code=404)
+    
     return responses.success(account)
 
 
 @router.get("/accounts")
-async def get_many_accounts(page: int = 1, page_size: int = 30):
-    user_accounts = await accounts.get_many_accounts(page, page_size)
+async def fetch_many(page: int = 1, page_size: int = 30):
+    user_accounts = await accounts.fetch_many(page, page_size)
+    
+    if isinstance(user_accounts, ServiceError):
+        return responses.failure(user_accounts, message="No Account Found!", status_code=404)
+    
     return responses.success(user_accounts)
 
 
 @router.get("/accounts/{id}")
-async def get_account_by_id(id: UUID):
-    user_account = await accounts.get_account_by_id(id)
+async def fetch_one(id: UUID):
+    user_account = await accounts.fetch_one(id)
 
-    if user_account is None:
-        return responses.failure(user_account, status_code=404)
+    if isinstance(user_account, ServiceError):
+        return responses.failure(user_account, message="Account not found!", status_code=404,)
 
     return responses.success(user_account)
 
 
 @router.patch("/accounts/{id}")
-async def update_account_by_id(id: UUID, args: AccountUpdateDTO):
-    user_account = await accounts.update_account_by_id(
+async def update_by_id(id: UUID, args: AccountUpdateDTO):
+    user_account = await accounts.update_by_id(
         id=id,
         username=args.username,
         email=args.email,
         password=args.password,
     )
 
-    if user_account is None:
-        return responses.failure(user_account, status_code=404)
+    if isinstance(user_account, ServiceError):
+        return responses.failure(user_account, message="Account update failed!", status_code=404,)
 
     return responses.success(user_account)
 
 
 @router.delete("/accounts/{id}")
-async def delete_account_by_id(id: UUID):
-    user_account = await accounts.delete_account_by_id(id)
+async def delete_by_id(id: UUID):
+    user_account = await accounts.delete_by_id(id)
 
-    if user_account is None:
-        return responses.failure(user_account, status_code=404)
+    if isinstance(user_account, ServiceError):
+        return responses.failure(user_account, message="Account deletion failed!", status_code=404,)
 
     return responses.success(user_account)
