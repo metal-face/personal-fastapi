@@ -1,4 +1,4 @@
-FROM python:3.11
+FROM python:3.10
 
 ENV PYTHONUNBUFFERED=1
 
@@ -14,9 +14,6 @@ RUN wget https://github.com/golang-migrate/migrate/releases/download/v4.15.2/mig
     mv migrate /usr/local/bin/go-migrate && \
     chmod u+x /usr/local/bin/go-migrate && \
     rm migrate.linux-amd64.tar.gz
-
-COPY scripts /scripts
-RUN chmod u+x /scripts/*
 
 COPY . /srv/root
 WORKDIR /srv/root
