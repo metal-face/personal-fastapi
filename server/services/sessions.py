@@ -12,7 +12,7 @@ async def login(
     password: str,
     user_agent: str,
 ) -> Union[dict[str, Any], ServiceError]:
-    account = await accounts.get_account_by_username(username)
+    account = await accounts.fetch_by_username(username)
 
     if account is None:
         return ServiceError.ACCOUNTS_NOT_FOUND
