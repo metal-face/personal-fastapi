@@ -113,4 +113,4 @@ async def delete_by_id(id: UUID) -> Union[dict[str, Any], None]:
             "id": id,
         },
     )
-    return dict(account) if account is not None else None
+    return dict(account._mapping) if account is not None else None

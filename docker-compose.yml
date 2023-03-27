@@ -22,8 +22,10 @@ services:
   website-backend:
     image: website-backend:latest
     ports: 
-      - 10000:80
+      - 10000
     environment:
+      - APP_ENV=${APP_ENV}
+      - APP_COMPONENT=${APP_COMPONENT}
       - DB_DRIVER=${DB_DRIVER}
       - DB_USER=${DB_USER}
       - DB_PASS=${DB_PASS}

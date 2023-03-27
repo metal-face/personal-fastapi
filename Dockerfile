@@ -15,9 +15,12 @@ RUN wget https://github.com/golang-migrate/migrate/releases/download/v4.15.2/mig
     chmod u+x /usr/local/bin/go-migrate && \
     rm migrate.linux-amd64.tar.gz
 
-COPY . /srv/root
+COPY scripts /scripts
+RUN chmod u+x /scripts/*
+
+COPY mount /srv/root
 WORKDIR /srv/root
 
-EXPOSE 80
+EXPOSE 10000
 
-ENTRYPOINT [ "/srv/root/main.py" ]
+ENTRYPOINT [ "/scripts/bootstrap.sh" ]
