@@ -4,6 +4,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+APP_COMPONENT = os.environ["APP_COMPONENT"]
+APP_ENV = os.environ["APP_ENV"]
+
 DB_DRIVER = os.environ["DB_DRIVER"]
 DB_USER = os.environ["DB_USER"]
 DB_PASS = os.environ["DB_PASS"]
