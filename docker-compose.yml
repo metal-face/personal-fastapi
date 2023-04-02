@@ -2,29 +2,30 @@ version: "3.3"
 
 services:
 
-  postgres: 
-    image:  postgres:13
+  postgres:
+    image: postgres:13
     environment:
       POSTGRES_PASSWORD: ${DB_PASS}
     volumes:
-    - ./pgdata:/var/lib/postgresql/data
+      - ./pgdata:/var/lib/postgresql/data
     ports:
-    - 5432:5432
+      - 5432:5432
 
-  redis:  
+  redis:
     image: redis
     volumes:
       - ./redis.conf:/usr/local/etc/redis/redis.conf
     ports:
       - 6379:6379
 
-
   website-backend:
     image: website-backend:latest
-    ports: 
-      - 10000
+    ports:
+      - 10000:${APP_PORT}
     environment:
       - APP_ENV=${APP_ENV}
+      - APP_HOST=${APP_HOST}
+      - APP_PORT=${APP_PORT}
       - APP_COMPONENT=${APP_COMPONENT}
       - DB_DRIVER=${DB_DRIVER}
       - DB_USER=${DB_USER}
