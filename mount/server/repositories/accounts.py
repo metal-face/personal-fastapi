@@ -3,24 +3,24 @@ from uuid import UUID
 
 from server.utils import services
 
-READ_PARAMS = "id, username, email, created_at"
+READ_PARAMS = "account_id, username, email, created_at"
 
-
-async def create(username: str, email: str, password: str) -> dict[str, Any]:
+async def create(account_id: UUID, username: str, email: str, password: str) -> dict[str, Any]:
     account = await services.database.fetch_one(
         query=f"""
-            INSERT INTO accounts (username, email, password)
-            VALUES (:username, :email, :password)
+            INSERT INTO accounts (account_id, username, email, password)
+            VALUES (:account_id, :username, :email, :password)
             RETURNING ({READ_PARAMS})
         """,
         values={
+            "account_id": account_id,
             "username": username,
             "email": email,
             "password": password,
         },
     )
     assert account is not None
-    return dict(account._mapping.items())
+    return dict(account._mapping)
 
 
 async def fetch_many(page: int, page_size: int) -> list[dict[str, Any]]:
@@ -39,15 +39,15 @@ async def fetch_many(page: int, page_size: int) -> list[dict[str, Any]]:
     return [dict(account._mapping) for account in accounts]
 
 
-async def fetch_one(id: UUID) -> Union[dict[str, Any], None]:
+async def fetch_one(account_id: UUID) -> Union[dict[str, Any], None]:
     account = await services.database.fetch_one(
         query=f"""
             SELECT {READ_PARAMS} 
             FROM accounts 
-            WHERE id = :id
+            WHERE account_id = :account_id
         """,
         values={
-            "id": id,
+            "account_id": account_id,
         },
     )
     return dict(account._mapping) if account is not None else None
@@ -78,7 +78,7 @@ async def fetch_by_username(username: str) -> Union[dict[str, Any], None]:
 
 
 async def update_by_id(
-    id: UUID,
+    account_id: UUID,
     username: str | None,
     email: str | None,
     password: str | None,
@@ -93,16 +93,16 @@ async def update_by_id(
             RETURNING ({READ_PARAMS})
         """,
         values={
-            "id": id,
+            "account_id": account_id,
             "username": username,
             "email": email,
             "password": password,
         },
     )
-    return dict(account) if account is not None else None
+    return dict(account._mapping) if account is not None else None
 
 
-async def delete_by_id(id: UUID) -> Union[dict[str, Any], None]:
+async def delete_by_id(account_id: UUID) -> Union[dict[str, Any], None]:
     account = await services.database.fetch_one(
         query=f"""
             DELETE FROM accounts
@@ -110,7 +110,7 @@ async def delete_by_id(id: UUID) -> Union[dict[str, Any], None]:
             RETURNING ({READ_PARAMS})
         """,
         values={
-            "id": id,
+            "account_id": account_id,
         },
     )
     return dict(account._mapping) if account is not None else None

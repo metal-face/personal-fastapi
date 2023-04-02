@@ -1,5 +1,5 @@
 from typing import Any, Union
-from uuid import UUID
+from uuid import UUID, uuid4
 
 
 from server.utils.errors import ServiceError
@@ -29,6 +29,7 @@ async def signup(
         return ServiceError.ACCOUNTS_USERNAME_EXISTS
 
     account = await accounts.create(
+        account_id=uuid4(),
         email=email_address,
         password=password,
         username=username,
