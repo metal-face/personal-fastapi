@@ -8,3 +8,4 @@ class Account(BaseModel):
     username: str
     email: str
     created_at: datetime 
+    updated_at: datetime
