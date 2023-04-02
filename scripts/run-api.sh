@@ -13,6 +13,8 @@ else
 fi
 
 exec uvicorn \
-    --port 10000 \
+    --host $APP_HOST \
+    --port $APP_PORT \
+    --no-access-log \
     $EXTRA_PARAMS \
     server.main:app

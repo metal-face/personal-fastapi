@@ -7,8 +7,6 @@ from server.utils import settings
 from server.adapters import database
 from aioredis import Redis
 
-import uvicorn
-
 app = FastAPI()
 app.include_router(router)
 
@@ -46,7 +44,3 @@ async def start_redis():
 @app.on_event("shutdown")
 async def stop_redis():
     await services.redis.close()
-
-
-if __name__ == "__main__":
-    uvicorn.run("main:app")

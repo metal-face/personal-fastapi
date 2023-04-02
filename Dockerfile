@@ -21,6 +21,6 @@ RUN chmod u+x /scripts/*
 COPY mount /srv/root
 WORKDIR /srv/root
 
-EXPOSE 10000
+EXPOSE 80
 
 ENTRYPOINT [ "/scripts/bootstrap.sh" ]
