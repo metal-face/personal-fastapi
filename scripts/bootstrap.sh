@@ -11,7 +11,7 @@ cd /srv/root
 /scripts/init-db.sh
 
 # run sql database migrations & seeds
-# /scripts/migrate-db.sh up
+/scripts/migrate-db.sh up
 # /scripts/seed-db.sh up
 
 case $APP_COMPONENT in
