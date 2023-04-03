@@ -60,7 +60,7 @@ async def login(
     
 @router.get("/v1/sessions")
 async def fetch_many(
-    account_id: int | None = None,
+    account_id: UUID | None = None,
     user_agent: str | None = None,
     page: int = 1, 
     page_size: int = 10,
@@ -101,7 +101,7 @@ async def fetch_session_by_id(
     resp = Session.from_mapping(data)
     return success(resp)
 
-@router.delete("/v1/sessions/{session_id}")
+@router.delete("/v1/sessions")
 async def logout(
     http_credentials: HTTPAuthorizationCredentials | None = Depends(
         http_scheme

@@ -1,6 +1,7 @@
 from fastapi.responses import JSONResponse
 from typing import Any
 import orjson
+from asyncpg.pgproto import pgproto
 from uuid import UUID
 from pydantic import BaseModel
 
@@ -12,7 +13,7 @@ def _default_processor(data: Any) -> Any:
         return {k: _default_processor(v) for k, v in data.items()}
     elif isinstance(data, list):
         return [_default_processor(v) for v in data]
-    elif isinstance(data, UUID):
+    elif isinstance(data, (UUID, pgproto.UUID)):
         return str(data)
     else:
         return data

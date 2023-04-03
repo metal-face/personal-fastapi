@@ -23,7 +23,7 @@ async def login(
     session_id = uuid4()
     session = await sessions.create(
         session_id=session_id,
-        account_id=account["id"],
+        account_id=account["account_id"],
         user_agent=user_agent,
     )
 
@@ -40,7 +40,7 @@ async def fetch_one(session_id: UUID) -> Union[dict[str, Any], ServiceError]:
 
 
 async def fetch_many(
-    account_id: int | None,
+    account_id: UUID | None,
     user_agent: str | None,
     page: int,
     page_size: int,

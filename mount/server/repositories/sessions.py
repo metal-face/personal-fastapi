@@ -35,7 +35,7 @@ def deserialize(raw_session: str) -> dict[str, Any]:
     assert isinstance(session, dict)
 
     session["session_id"] = UUID(session["session_id"])
-    session["account_id"] = int(session["account_id"])
+    session["account_id"] = UUID(session["account_id"])
     session["expires_at"] = datetime.fromisoformat(session["expires_at"])
     session["created_at"] = datetime.fromisoformat(session["created_at"])
     session["updated_at"] = datetime.fromisoformat(session["updated_at"])
@@ -45,7 +45,7 @@ def deserialize(raw_session: str) -> dict[str, Any]:
 
 async def create(
     session_id: UUID,
-    account_id: int,
+    account_id: UUID,
     user_agent: str,
 ) -> dict[str, Any]:
     now = datetime.now()
@@ -59,7 +59,7 @@ async def create(
         "updated_at": now,
     }
 
-    await services.redis.set(name=make_key(session_id), value=serialize(session))
+    await services.redis.set(name=make_key(session_id), value=serialize(session), ex=SESSION_EXPIRY)
 
     return session
 
@@ -71,7 +71,7 @@ async def fetch_one(session_id: UUID) -> Union[dict[str, Any], None]:
 
 
 async def fetch_many(
-    account_id: int | None,
+    account_id: UUID | None,
     user_agent: str | None,
     page: int,
     page_size: int,

@@ -106,7 +106,7 @@ async def delete_by_id(account_id: UUID) -> Union[dict[str, Any], None]:
     account = await services.database.fetch_one(
         query=f"""
             DELETE FROM accounts
-            WHERE id = :id
+            WHERE account_id = :account_id
             RETURNING {READ_PARAMS}
         """,
         values={

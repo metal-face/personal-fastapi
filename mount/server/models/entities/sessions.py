@@ -6,7 +6,7 @@ from . import BaseModel
 
 class Session(BaseModel):
     session_id: UUID
-    account_id: int
+    account_id: UUID
     user_agent: str
     expires_at: datetime
     created_at: datetime
