@@ -10,7 +10,7 @@ async def create(account_id: UUID, username: str, email: str, password: str) -> 
         query=f"""
             INSERT INTO accounts (account_id, username, email, password)
             VALUES (:account_id, :username, :email, :password)
-            RETURNING ({READ_PARAMS})
+            RETURNING {READ_PARAMS}
         """,
         values={
             "account_id": account_id,
@@ -89,8 +89,8 @@ async def update_by_id(
             SET username = COALESCE(:username, username),
             email = COALESCE(:email, email),
             password = COALESCE(:password, password)
-            WHERE id = :id
-            RETURNING ({READ_PARAMS})
+            WHERE account_id = :account_id
+            RETURNING {READ_PARAMS}
         """,
         values={
             "account_id": account_id,
@@ -107,7 +107,7 @@ async def delete_by_id(account_id: UUID) -> Union[dict[str, Any], None]:
         query=f"""
             DELETE FROM accounts
             WHERE id = :id
-            RETURNING ({READ_PARAMS})
+            RETURNING {READ_PARAMS}
         """,
         values={
             "account_id": account_id,
