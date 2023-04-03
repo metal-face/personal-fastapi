@@ -2,13 +2,15 @@
 from fastapi import FastAPI
 from databases import Database
 from server.utils import services
-from server.api.rest.v1.accounts import router
+from server.api.rest.v1.sessions import router as sessions_router
+from server.api.rest.v1.accounts import router as accounts_router
 from server.utils import settings
 from server.adapters import database
 from aioredis import Redis
 
 app = FastAPI()
-app.include_router(router)
+app.include_router(accounts_router)
+app.include_router(sessions_router)
 
 
 @app.on_event("startup")
