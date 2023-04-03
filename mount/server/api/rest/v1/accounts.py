@@ -6,7 +6,7 @@ from server.api.rest import responses
 from server.models.dto.accounts import AccountUpdateDTO
 from server.utils.errors import ServiceError
 
-router = APIRouter()
+router = APIRouter(tags=["Accounts"])
 
 
 @router.post("/accounts")

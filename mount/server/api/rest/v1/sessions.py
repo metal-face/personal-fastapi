@@ -11,7 +11,7 @@ from server.models.entities.sessions import Session
 from fastapi import Header, status, APIRouter, Depends
 from typing import Union
 
-router = APIRouter()
+router = APIRouter(tags=["Sessions"])
 http_scheme = HTTPBearer(auto_error=False)
 
 
