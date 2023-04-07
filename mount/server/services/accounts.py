@@ -12,6 +12,7 @@ async def signup(
     email_address: str,
     password: str,
     username: str,
+    role: str,
 ) -> Union[dict[str, Any], ServiceError]:
     if not validation.validate_username(username):
         return ServiceError.ACCOUNTS_USERNAME_INVALID
@@ -33,6 +34,7 @@ async def signup(
         email=email_address,
         password=password,
         username=username,
+        role=role,
     )
 
     if account is None:
@@ -78,8 +80,9 @@ async def update_by_id(
     username: str | None = None, 
     email: str | None = None, 
     password: str | None = None,
+    role: str | None = None,
 ) -> Union[dict[str, Any], ServiceError]:
-    user_account = await accounts.update_by_id(id, username, email, password)
+    user_account = await accounts.update_by_id(id, username, email, password, role)
     
     if user_account is None:
         return ServiceError.ACCOUNTS_NOT_FOUND
