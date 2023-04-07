@@ -11,48 +11,46 @@ router = APIRouter(tags=["Accounts"])
 
 @router.post("/accounts")
 async def create_account(args: AccountDTO):
-    account = await accounts.signup(
+    result = await accounts.signup(
         args.email,
         args.password,
         args.username,
         args.role,
     )
 
-    if isinstance(account, ServiceError):
-        return responses.failure(account, message="Signup Failed!", status_code=404)
+    if isinstance(result, ServiceError):
+        return responses.failure(result, message="Signup Failed!", status_code=404)
 
-    return responses.success(account)
+    return responses.success(result)
 
 
 @router.get("/accounts")
 async def fetch_many(page: int = 1, page_size: int = 30):
-    user_accounts = await accounts.fetch_many(page, page_size)
+    result = await accounts.fetch_many(page, page_size)
 
-    if isinstance(user_accounts, ServiceError):
-        return responses.failure(
-            user_accounts, message="No Account Found!", status_code=404
-        )
+    if isinstance(result, ServiceError):
+        return responses.failure(result, message="No Account Found!", status_code=404)
 
-    return responses.success(user_accounts)
+    return responses.success(result)
 
 
 @router.get("/accounts/{id}")
 async def fetch_one(id: UUID):
-    user_account = await accounts.fetch_one(id)
+    result = await accounts.fetch_one(id)
 
-    if isinstance(user_account, ServiceError):
+    if isinstance(result, ServiceError):
         return responses.failure(
-            user_account,
+            result,
             message="Account not found!",
             status_code=404,
         )
 
-    return responses.success(user_account)
+    return responses.success(result)
 
 
 @router.patch("/accounts/{id}")
 async def update_by_id(id: UUID, args: AccountUpdateDTO):
-    user_account = await accounts.update_by_id(
+    result = await accounts.update_by_id(
         id=id,
         username=args.username,
         email=args.email,
@@ -60,25 +58,38 @@ async def update_by_id(id: UUID, args: AccountUpdateDTO):
         role=args.role,
     )
 
-    if isinstance(user_account, ServiceError):
-        return responses.failure(
-            user_account,
-            message="Account update failed!",
-            status_code=404,
-        )
+    if isinstance(result, ServiceError):
+        if result == ServiceError.ACCOUNTS_EMAIL_ADDRESS_EXISTS:
+            return responses.failure(
+                result,
+                message="An account with this email already exists!",
+                status_code=409,
+            )
+        elif result == ServiceError.ACCOUNTS_USERNAME_EXISTS:
+            return responses.failure(
+                result,
+                message="An account with this username already exists!",
+                status_code=409,
+            )
+        else:
+            return responses.failure(
+                result,
+                message="Account update failed!",
+                status_code=404,
+            )
 
-    return responses.success(user_account)
+    return responses.success(result)
 
 
 @router.delete("/accounts/{id}")
 async def delete_by_id(id: UUID):
-    user_account = await accounts.delete_by_id(id)
+    result = await accounts.delete_by_id(id)
 
-    if isinstance(user_account, ServiceError):
+    if isinstance(result, ServiceError):
         return responses.failure(
-            user_account,
+            result,
             message="Account deletion failed!",
             status_code=404,
         )
 
-    return responses.success(user_account)
+    return responses.success(result)
