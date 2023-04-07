@@ -45,7 +45,7 @@ async def signup(
 
 async def fetch_one(id: UUID) -> Union[dict[str, Any], ServiceError]:
     account = await accounts.fetch_one(id)
-    
+
     if account is None:
         return ServiceError.ACCOUNTS_NOT_FOUND
 
@@ -70,30 +70,43 @@ async def fetch_by_username(username: str) -> Union[dict[str, Any], ServiceError
     return account
 
 
-async def fetch_many(page: int, page_size: int) -> Union[list[dict[str, Any]], ServiceError]:
+async def fetch_many(
+    page: int, page_size: int
+) -> Union[list[dict[str, Any]], ServiceError]:
     user_accounts = await accounts.fetch_many(page, page_size)
 
     return user_accounts
 
+
 async def update_by_id(
-    id: UUID, 
-    username: str | None = None, 
-    email: str | None = None, 
+    id: UUID,
+    username: str | None = None,
+    email: str | None = None,
     password: str | None = None,
     role: str | None = None,
 ) -> Union[dict[str, Any], ServiceError]:
+    if username is not None:
+        user_exists = await accounts.fetch_by_username(username)
+        if user_exists is not None:
+            return ServiceError.ACCOUNTS_USERNAME_EXISTS
+
+    if email is not None:
+        email_exists = await accounts.fetch_by_email(email)
+        if email_exists is not None:
+            return ServiceError.ACCOUNTS_EMAIL_ADDRESS_EXISTS
+
     user_account = await accounts.update_by_id(id, username, email, password, role)
-    
+
     if user_account is None:
         return ServiceError.ACCOUNTS_NOT_FOUND
-    
+
     return user_account
-    
+
 
 async def delete_by_id(id: UUID) -> Union[dict[str, Any], ServiceError]:
     account = await accounts.delete_by_id(id)
-    
+
     if account is None:
         return ServiceError.ACCOUNTS_DELETION_FAILED
-    
+
     return account
