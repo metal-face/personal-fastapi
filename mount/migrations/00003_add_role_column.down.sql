@@ -1,2 +1,2 @@
 ALTER TABLE accounts
-    DROP COLUMN password;
+    DROP COLUMN role;
