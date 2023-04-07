@@ -5,7 +5,10 @@ from server.utils import services
 
 READ_PARAMS = "account_id, username, email, role, created_at, updated_at"
 
-async def create(account_id: UUID, username: str, email: str, password: str, role: str) -> dict[str, Any]:
+
+async def create(
+    account_id: UUID, username: str, email: str, password: str, role: str
+) -> dict[str, Any]:
     account = await services.database.fetch_one(
         query=f"""
             INSERT INTO accounts (account_id, username, email, password, role)
@@ -24,7 +27,9 @@ async def create(account_id: UUID, username: str, email: str, password: str, rol
     return dict(account._mapping)
 
 
-async def fetch_many(page: int, page_size: int, role: str | None = None) -> list[dict[str, Any]]:
+async def fetch_many(
+    page: int, page_size: int, role: str | None = None
+) -> list[dict[str, Any]]:
     accounts = await services.database.fetch_all(
         query=f"""
             SELECT {READ_PARAMS} 
@@ -92,7 +97,7 @@ async def update_by_id(
             UPDATE accounts
             SET username = COALESCE(:username, username),
             email = COALESCE(:email, email),
-            password = COALESCE(:password, password)
+            password = COALESCE(:password, password),
             role = COALESCE(:role, role)
             WHERE account_id = :account_id
             RETURNING {READ_PARAMS}
