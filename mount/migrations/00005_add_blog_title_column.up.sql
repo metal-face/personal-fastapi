@@ -1,0 +1,2 @@
+ALTER TABLE blogs
+    ADD COLUMN blog_title TEXT NOT NULL;
