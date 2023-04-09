@@ -16,6 +16,14 @@ class ServiceError(str, Enum):
     CREDENTIALS_NOT_FOUND = "credentials.incorrect_credentials"
     CREDENTIALS_INCORRECT = "credentials.incorrect_credentials"
 
+    BLOGS_CREATION_FAILED = "blogs.creation_failed"
+    BLOGS_UPDATE_FAILED = "blogs.deletion_failed"
+    BLOGS_DELETION_FAILED = "blog.post_deletion_failed"
+    BLOGS_POST_NOT_FOUND = "blog.post_not_found"
+    BLOG_POSTS_NOT_FOUND = "blog.posts_not_found"
+    BLOG_POST_INCORRECT_LENGTH = "blog.post_incorrect_length"
+    BLOG_POST_TITLE_INCORRECT_LENGTH = "blog.post_incorrect_length"
+
     AVATARS_CREATION_FAILED = "avatars.creation_failed"
     AVATARS_DELETION_FAILED = "avatars.deletion_failed"
     AVATARS_NOT_FOUND = "avatars.not_found"
