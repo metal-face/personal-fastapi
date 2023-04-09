@@ -14,8 +14,8 @@ async def create(
 ) -> dict[str, Any]:
     blog = await services.database.fetch_one(
         query=f"""
-            INSERT INTO blogs (blog_id, blog_post, blog_title, account_id,)
-            VALUES (:blog_id, :blog_post, blog_title, :account_id,)
+            INSERT INTO blogs (blog_id, blog_post, blog_title, account_id)
+            VALUES (:blog_id, :blog_post, blog_title, :account_id)
             RETURN {READ_PARAMS}
         """,
         values={
