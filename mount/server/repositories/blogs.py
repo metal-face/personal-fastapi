@@ -3,23 +3,25 @@ from uuid import UUID
 
 from server.utils import services
 
-READ_PARAMS = "blog_id, blog_post, created_at, updated_at, created_by"
+READ_PARAMS = "blog_id, blog_post, blog_title, account_id, created_at, updated_at"
 
 
 async def create(
     account_id: UUID,
     blog_id: UUID,
     blog_post: str,
+    blog_title: str,
 ) -> dict[str, Any]:
     blog = await services.database.fetch_one(
         query=f"""
-            INSERT INTO blogs (blog_id, blog_post, account_id)
-            VALUES (:blog_id, :blog_post, :account_id)
+            INSERT INTO blogs (blog_id, blog_post, blog_title, account_id,)
+            VALUES (:blog_id, :blog_post, blog_title, :account_id,)
             RETURN {READ_PARAMS}
         """,
         values={
             "blog_id": blog_id,
             "blog_post": blog_post,
+            "blog_title": blog_title,
             "account_id": account_id,
         },
     )
@@ -66,17 +68,20 @@ async def fetch_one(blog_id: UUID) -> Union[dict[str, Any], None]:
 async def update_by_id(
     blog_id: UUID,
     blog_post: str | None,
+    blog_title: str | None,
 ) -> Union[dict[str, Any], None]:
     blog = await services.database.fetch_one(
         query=f"""
             UPDATE blogs
             SET blog_post = COALESCE(:blog_post, blog_post)
+            blog_title = COALESCE(:blog_title, blog_title)
             WHERE blog_id = :blog_id
             RETURNING {READ_PARAMS}
         """,
         values={
             "blog_id": blog_id,
             "blog_post": blog_post,
+            "blog_title": blog_title,
         },
     )
     return dict(blog._mapping) if blog is not None else None
