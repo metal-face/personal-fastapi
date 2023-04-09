@@ -47,3 +47,50 @@ async def fetch_many(
         },
     )
     return [dict(blog._mapping) for blog in blogs]
+
+
+async def fetch_one(blog_id: UUID) -> Union[dict[str, Any], None]:
+    blog = services.database.fetch_one(
+        query=f"""
+            SELECT {READ_PARAMS}
+            FROM blogs
+            WHERE blog_id = :blog_id
+        """,
+        values={
+            "blog_id": blog_id,
+        },
+    )
+    return dict(blog._mapping) if blog is not None else None
+
+
+async def update_by_id(
+    blog_id: UUID,
+    blog_post: str | None,
+) -> Union[dict[str, Any], None]:
+    blog = await services.database.fetch_one(
+        query=f"""
+            UPDATE blogs
+            SET blog_post = COALESCE(:blog_post, blog_post)
+            WHERE blog_id = :blog_id
+            RETURNING {READ_PARAMS}
+        """,
+        values={
+            "blog_id": blog_id,
+            "blog_post": blog_post,
+        },
+    )
+    return dict(blog._mapping) if blog is not None else None
+
+
+async def delete_by_id(blog_id: UUID) -> Union[dict[str, Any], None]:
+    blog = await services.database.fetch_one(
+        query=f"""
+            DELETE from blogs
+            WHERE blog_id = :blog_id
+            RETURNING {READ_PARAMS}
+        """,
+        values={
+            "blog_id": blog_id,
+        },
+    )
+    return dict(blog._mapping) if blog is not None else None
