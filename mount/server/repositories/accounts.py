@@ -78,7 +78,7 @@ async def fetch_by_username(username: str) -> Union[dict[str, Any], None]:
         query=f"""
             SELECT {READ_PARAMS}
             FROM accounts
-            where username = :username
+            WHERE username = :username
         """,
         values={"username": username},
     )
