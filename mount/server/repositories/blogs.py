@@ -15,8 +15,8 @@ async def create(
     blog = await services.database.fetch_one(
         query=f"""
             INSERT INTO blogs (blog_id, blog_post, blog_title, account_id)
-            VALUES (:blog_id, :blog_post, blog_title, :account_id)
-            RETURN {READ_PARAMS}
+            VALUES (:blog_id, :blog_post, :blog_title, :account_id)
+            RETURNING {READ_PARAMS}
         """,
         values={
             "blog_id": blog_id,
@@ -29,6 +29,7 @@ async def create(
     return dict(blog._mapping)
 
 
+# TODO: Figure out why account_id is necessary even though it's coded not to.
 async def fetch_many(
     page: int,
     page_size: int,
@@ -51,8 +52,9 @@ async def fetch_many(
     return [dict(blog._mapping) for blog in blogs]
 
 
+# TODO: Figure out why it's returning nothing.
 async def fetch_one(blog_id: UUID) -> Union[dict[str, Any], None]:
-    blog = services.database.fetch_one(
+    blog = await services.database.fetch_one(
         query=f"""
             SELECT {READ_PARAMS}
             FROM blogs
@@ -73,7 +75,7 @@ async def update_by_id(
     blog = await services.database.fetch_one(
         query=f"""
             UPDATE blogs
-            SET blog_post = COALESCE(:blog_post, blog_post)
+            SET blog_post = COALESCE(:blog_post, blog_post),
             blog_title = COALESCE(:blog_title, blog_title)
             WHERE blog_id = :blog_id
             RETURNING {READ_PARAMS}
