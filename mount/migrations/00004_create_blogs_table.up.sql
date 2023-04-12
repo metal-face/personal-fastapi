@@ -4,6 +4,6 @@ CREATE TABLE blogs (
     blog_post TEXT NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    created_by UUID NOT NULL FOREIGN KEY
+    created_by UUID NOT NULL
         REFERENCES accounts (account_id)
 );
