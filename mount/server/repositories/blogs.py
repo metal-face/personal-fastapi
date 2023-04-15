@@ -29,7 +29,6 @@ async def create(
     return dict(blog._mapping)
 
 
-# TODO: Figure out why account_id is necessary even though it's coded not to.
 async def fetch_many(
     page: int,
     page_size: int,
