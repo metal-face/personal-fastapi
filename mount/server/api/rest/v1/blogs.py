@@ -27,9 +27,11 @@ async def create_post(args: BlogDTO):
     return responses.success(result)
 
 
-@router.get("/blogs/{account_id}")
+@router.get("/blogs")
 async def fetch_many(
-    page: int = 1, page_size: int = 30, account_id: UUID | None = None
+    page: int = 1,
+    page_size: int = 30,
+    account_id: UUID | None = None,
 ):
     result = await blogs.fetch_many(
         page=page,
