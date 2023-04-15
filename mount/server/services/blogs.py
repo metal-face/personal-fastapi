@@ -12,10 +12,10 @@ async def create_post(
     blog_post: str,
     blog_title: str,
 ) -> Union[dict[str, Any], ServiceError]:
-    if len(blog_post) < 100 | len(blog_post) > 200_000:
+    if len(blog_post) < 100 or len(blog_post) > 200_000:
         return ServiceError.BLOG_POST_INCORRECT_LENGTH
 
-    if len(blog_title) < 5 | len(blog_title) > 100:
+    if len(blog_title) < 5 or len(blog_title) > 100:
         return ServiceError.BLOG_POST_TITLE_INCORRECT_LENGTH
 
     blog = await blogs.create(
@@ -50,14 +50,16 @@ async def fetch_many(
 
 async def update_by_id(
     blog_id: UUID,
-    blog_post: str,
-    blog_title: str,
+    blog_post: str | None,
+    blog_title: str | None,
 ) -> Union[dict[str, Any], ServiceError]:
-    if len(blog_post) < 100 | len(blog_post) > 200_000:
-        return ServiceError.BLOG_POST_INCORRECT_LENGTH
+    if blog_post is not None:
+        if len(blog_post) < 100 or len(blog_post) > 200_000:
+            return ServiceError.BLOG_POST_INCORRECT_LENGTH
 
-    if len(blog_title) < 5 | len(blog_title) > 100:
-        return ServiceError.BLOG_POST_TITLE_INCORRECT_LENGTH
+    if blog_title is not None:
+        if len(blog_title) < 5 or len(blog_title) > 100:
+            return ServiceError.BLOG_POST_TITLE_INCORRECT_LENGTH
 
     blog = await blogs.update_by_id(
         blog_id=blog_id,
