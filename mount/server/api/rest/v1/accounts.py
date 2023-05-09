@@ -47,6 +47,19 @@ async def fetch_one(id: UUID):
 
     return responses.success(result)
 
+@router.get("/accounts")
+async def fetch_by_email(email: str):
+    result = await accounts.fetch_by_email(email)
+
+    if isinstance(result, ServiceError):
+        return responses.failure(
+            result,
+            message="No account with that email!",
+            status_code=404
+        )
+    
+    return responses.success(result)
+
 
 @router.patch("/accounts/{id}")
 async def update_by_id(id: UUID, args: AccountUpdateDTO):
