@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from databases import Database
 from server.utils import services
 from server.api.rest.v1.sessions import router as sessions_router
@@ -14,6 +15,18 @@ app.include_router(accounts_router)
 app.include_router(sessions_router)
 app.include_router(blogs_router)
 
+origins = [
+    "http://localhost:3000",
+    "http://localhost:10000"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.on_event("startup")
 async def start_database():
