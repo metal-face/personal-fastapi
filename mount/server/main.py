@@ -17,7 +17,7 @@ app.include_router(blogs_router)
 
 origins = [
     "http://localhost:3000",
-    "http://localhost:10000"
+    "http://localhost:10000",
 ]
 
 app.add_middleware(
@@ -27,6 +27,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 @app.on_event("startup")
 async def start_database():
