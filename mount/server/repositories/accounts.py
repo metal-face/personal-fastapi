@@ -60,27 +60,17 @@ async def fetch_one(account_id: UUID) -> Union[dict[str, Any], None]:
     )
     return dict(account._mapping) if account is not None else None
 
-async def fetch_account_by_email(email: str) -> Union[dict[str, Any], None]:
-    account = await services.database.fetch_one(
-        query = f"""
-            SELECT {READ_PARAMS}
-            FROM accounts
-            WHERE email = :email
-        """,
-        values = {
-            "email": email
-        }
-    )
-    return dict(account._mapping) if account is not None else None
 
 async def fetch_by_email(email: str) -> Union[dict[str, Any], None]:
     account = await services.database.fetch_one(
-        query=f"""
+        query=f"""\
             SELECT {READ_PARAMS}
             FROM accounts
             WHERE email = :email
         """,
-        values={"email": email},
+        values={
+            "email": email,
+        },
     )
     return dict(account._mapping) if account is not None else None
 
