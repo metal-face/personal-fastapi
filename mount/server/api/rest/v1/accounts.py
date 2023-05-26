@@ -25,13 +25,19 @@ async def create_account(args: AccountDTO):
 
 
 @router.get("/accounts")
-async def fetch_many(page: int = 1, page_size: int = 30):
-    result = await accounts.fetch_many(page, page_size)
+async def fetch_many(page: int = 1, page_size: int = 30, email: str | None = None):
+    account
 
-    if isinstance(result, ServiceError):
-        return responses.failure(result, message="No Account Found!", status_code=404)
+    if email is not None:
+        account = await accounts.fetch_by_email(email)
+        if isinstance(account, ServiceError):
+            return responses.failure(account, message="Email could not be found!")
+        return responses.success(account)
 
-    return responses.success(result)
+    account = await accounts.fetch_many(page, page_size)
+    if isinstance(account, ServiceError):
+        return responses.failure(account, message="Account not found!", status_code=404)
+    return responses.success(account)
 
 
 @router.get("/accounts/{id}")
@@ -45,19 +51,6 @@ async def fetch_one(id: UUID):
             status_code=404,
         )
 
-    return responses.success(result)
-
-@router.get("/accounts")
-async def fetch_by_email(email: str):
-    result = await accounts.fetch_by_email(email)
-
-    if isinstance(result, ServiceError):
-        return responses.failure(
-            result,
-            message="No account with that email!",
-            status_code=404
-        )
-    
     return responses.success(result)
 
 
