@@ -55,6 +55,8 @@ async def fetch_one(id: UUID) -> Union[dict[str, Any], ServiceError]:
 async def fetch_by_email(email: str) -> Union[dict[str, Any], ServiceError]:
     account = await accounts.fetch_by_email(email)
 
+    # TODO Wrap call to repo layer in try/catch
+    # TODO Return a ServiceError on error and None/empty list on success or success but empty
     if account is None:
         return ServiceError.ACCOUNTS_NOT_FOUND
 
