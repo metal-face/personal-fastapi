@@ -29,3 +29,5 @@ class ServiceError(str, Enum):
     AVATARS_NOT_FOUND = "avatars.not_found"
     AVATARS_CONTENT_TYPE_INVALID = "avatars.content_type_invalid"
     AVATARS_SIZE_TOO_LARGE = "avatars.size_too_large"
+
+    DATABASE_QUERY_FAILED = "database.query_failed"

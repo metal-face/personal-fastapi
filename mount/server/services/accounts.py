@@ -13,7 +13,7 @@ async def signup(
     password: str,
     username: str,
     role: str,
-) -> Union[dict[str, Any], ServiceError]:
+) -> dict[str, Any] | ServiceError:
     if not validation.validate_username(username):
         return ServiceError.ACCOUNTS_USERNAME_INVALID
 
@@ -43,7 +43,9 @@ async def signup(
     return account
 
 
-async def fetch_one(id: UUID) -> Union[dict[str, Any], ServiceError]:
+async def fetch_one(
+    id: UUID,
+) -> dict[str, Any] | ServiceError:
     account = await accounts.fetch_one(id)
 
     if account is None:
@@ -52,18 +54,19 @@ async def fetch_one(id: UUID) -> Union[dict[str, Any], ServiceError]:
     return account
 
 
-async def fetch_by_email(email: str) -> Union[dict[str, Any], ServiceError]:
-    account = await accounts.fetch_by_email(email)
+async def fetch_by_email(
+    email: str,
+) -> dict[str, Any] | None | ServiceError:
+    try:
+        account = await accounts.fetch_by_email(email)
+        return None if account is None else account
+    except Exception:
+        return ServiceError.DATABASE_QUERY_FAILED
 
-    # TODO Wrap call to repo layer in try/catch
-    # TODO Return a ServiceError on error and None/empty list on success or success but empty
-    if account is None:
-        return ServiceError.ACCOUNTS_NOT_FOUND
 
-    return account
-
-
-async def fetch_by_username(username: str) -> Union[dict[str, Any], ServiceError]:
+async def fetch_by_username(
+    username: str,
+) -> dict[str, Any] | ServiceError:
     account = await accounts.fetch_by_username(username)
 
     if account is None:
@@ -73,8 +76,9 @@ async def fetch_by_username(username: str) -> Union[dict[str, Any], ServiceError
 
 
 async def fetch_many(
-    page: int, page_size: int
-) -> Union[list[dict[str, Any]], ServiceError]:
+    page: int,
+    page_size: int,
+) -> list[dict[str, Any]] | ServiceError:
     user_accounts = await accounts.fetch_many(page, page_size)
 
     return user_accounts
@@ -86,7 +90,7 @@ async def update_by_id(
     email: str | None = None,
     password: str | None = None,
     role: str | None = None,
-) -> Union[dict[str, Any], ServiceError]:
+) -> dict[str, Any] | ServiceError:
     if username is not None:
         user_exists = await accounts.fetch_by_username(username)
         if user_exists is not None:
@@ -105,7 +109,9 @@ async def update_by_id(
     return user_account
 
 
-async def delete_by_id(id: UUID) -> Union[dict[str, Any], ServiceError]:
+async def delete_by_id(
+    id: UUID,
+) -> dict[str, Any] | ServiceError:
     account = await accounts.delete_by_id(id)
 
     if account is None:

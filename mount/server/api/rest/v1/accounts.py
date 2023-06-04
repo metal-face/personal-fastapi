@@ -25,18 +25,24 @@ async def create_account(args: AccountDTO):
 
 
 @router.get("/accounts")
-async def fetch_many(page: int = 1, page_size: int = 30, email: str | None = None):
-    # TODO: Handle for new logic added in service layer
-    if email is not None:
-        account = await accounts.fetch_by_email(email)
-        if isinstance(account, ServiceError):
-            return responses.failure(
-                account,
-                message="Email could not be found!",
-                status_code=204,
-            )
-        return responses.success(account)
+async def fetch_by_email(email: str):
+    result = await accounts.fetch_by_email(email)
 
+    if isinstance(result, ServiceError):
+        return responses.failure(
+            result,
+            message="Error! Something went wrong!",
+            status_code=500,
+        )
+
+    if result is None:
+        return responses.success([], status_code=204)
+    else:
+        return responses.success(result)
+
+
+@router.get("/accounts")
+async def fetch_many(page: int = 1, page_size: int = 30):
     account = await accounts.fetch_many(page, page_size)
     if isinstance(account, ServiceError):
         return responses.failure(

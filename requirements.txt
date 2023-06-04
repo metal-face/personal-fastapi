@@ -7,3 +7,4 @@ orjson
 aioredis
 email-validator
 structlog
+fastapi-mail
