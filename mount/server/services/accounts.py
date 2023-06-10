@@ -78,10 +78,14 @@ async def fetch_by_username(
 async def fetch_many(
     page: int,
     page_size: int,
-) -> list[dict[str, Any]] | ServiceError:
-    user_accounts = await accounts.fetch_many(page, page_size)
-
-    return user_accounts
+) -> list[dict[str, Any]] | None | ServiceError:
+    try:
+        user_accounts = await accounts.fetch_many(page, page_size)
+        return (
+            ServiceError.ACCOUNTS_NOT_FOUND if user_accounts is None else user_accounts
+        )
+    except Exception:
+        return ServiceError.DATABASE_QUERY_FAILED
 
 
 async def update_by_id(
