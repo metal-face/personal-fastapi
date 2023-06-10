@@ -3,6 +3,7 @@ from server.utils.json import OrJSONResponse
 from server.utils.errors import ServiceError
 from pydantic.generics import GenericModel
 from pydantic import BaseModel
+from fastapi import status, Response
 
 
 T = TypeVar("T")
@@ -74,3 +75,6 @@ def failure(
 ) -> Any:
     content = format_failure(error, message)
     return create_response(content, status_code, headers, cookies)
+
+def no_content(headers: dict[str, Any] | None = None) -> Response:
+    return Response(status_code=status.HTTP_204_NO_CONTENT, headers=headers)
