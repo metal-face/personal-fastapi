@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 from server.models.dto.accounts import AccountDTO
 from server.services import accounts
 from uuid import UUID
@@ -25,30 +25,33 @@ async def create_account(args: AccountDTO):
 
 
 @router.get("/accounts")
-async def fetch_by_email(email: str):
+async def fetch_by_email(email: str, request: Request):
     result = await accounts.fetch_by_email(email)
 
     if isinstance(result, ServiceError):
-        return responses.failure(
-            result,
-            message="Error! Something went wrong!",
-            status_code=500,
-        )
-
-    if result is None:
-        return responses.success([], status_code=204)
+        if result is ServiceError.DATABASE_QUERY_FAILED:
+            return responses.failure(
+                result,
+                message="Error! Internal Server Error!",
+                status_code=500,
+            )
+        elif result is ServiceError.ACCOUNTS_NOT_FOUND:
+            return responses.success([])
     else:
         return responses.success(result)
 
 
 @router.get("/accounts")
 async def fetch_many(page: int = 1, page_size: int = 30):
-    account = await accounts.fetch_many(page, page_size)
-    if isinstance(account, ServiceError):
+    result = await accounts.fetch_many(page, page_size)
+    if isinstance(result, ServiceError):
         return responses.failure(
-            account, message="Accounts not found!", status_code=204
+            result,
+            message="Error! Internal Server Error!",
+            status_code=500,
         )
-    return responses.success(account)
+
+    return None if result is None else result
 
 
 @router.get("/accounts/{id}")
