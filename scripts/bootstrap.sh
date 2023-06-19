@@ -8,6 +8,9 @@ fi
 
 cd /srv/root
 
+# await connected service availability
+/scripts/await-service.sh $DB_HOST $DB_PORT $SERVICE_READINESS_TIMEOUT
+
 /scripts/init-db.sh
 
 # run sql database migrations & seeds
