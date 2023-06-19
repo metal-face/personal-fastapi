@@ -7,6 +7,7 @@ class ServiceError(str, Enum):
     ACCOUNTS_NOT_FOUND = "accounts.not_found"
     ACCOUNTS_USERNAME_INVALID = "accounts.username_invalid"
     ACCOUNTS_PASSWORD_INVALID = "accounts.password_invalid"
+    ACCOUNT_EMAIL_NOT_FOUND = "accounts.email_not_found"
     ACCOUNTS_EMAIL_ADDRESS_INVALID = "accounts.email_address_invalid"
     ACCOUNTS_EMAIL_ADDRESS_EXISTS = "accounts.email_address_exists"
     ACCOUNTS_USERNAME_EXISTS = "accounts.username_exists"
