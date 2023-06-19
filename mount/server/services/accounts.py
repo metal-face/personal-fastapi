@@ -56,10 +56,10 @@ async def fetch_one(
 
 async def fetch_by_email(
     email: str,
-) -> dict[str, Any] | None | ServiceError:
+) -> dict[str, Any] | ServiceError:
     try:
         account = await accounts.fetch_by_email(email)
-        return None if account is None else account
+        return ServiceError.ACCOUNT_EMAIL_NOT_FOUND if account is None else account
     except Exception:
         return ServiceError.DATABASE_QUERY_FAILED
 
