@@ -35,8 +35,12 @@ async def fetch_by_email(email: str, request: Request):
                 message="Error! Internal Server Error!",
                 status_code=500,
             )
-        elif result is ServiceError.ACCOUNTS_NOT_FOUND:
-            return responses.success([])
+        elif result is ServiceError.ACCOUNT_EMAIL_NOT_FOUND:
+            return responses.failure(
+                result,
+                "Email not found!",
+                status_code=404,
+            )
     else:
         return responses.success(result)
 
