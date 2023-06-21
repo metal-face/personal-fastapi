@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Request
+from pydantic import BaseModel
 from server.models.dto.accounts import AccountDTO
 from server.services import accounts
 from uuid import UUID
@@ -8,6 +9,8 @@ from server.utils.errors import ServiceError
 
 router = APIRouter(tags=["Accounts"])
 
+class emailRequest(BaseModel):
+    email: str
 
 @router.post("/accounts")
 async def create_account(args: AccountDTO):
@@ -24,9 +27,9 @@ async def create_account(args: AccountDTO):
     return responses.success(result)
 
 
-@router.get("/accounts")
-async def fetch_by_email(email: str, request: Request):
-    result = await accounts.fetch_by_email(email)
+@router.post("/search")
+async def fetch_by_email(request: emailRequest):
+    result = await accounts.fetch_by_email(request.email)
 
     if isinstance(result, ServiceError):
         if result is ServiceError.DATABASE_QUERY_FAILED:
@@ -35,12 +38,8 @@ async def fetch_by_email(email: str, request: Request):
                 message="Error! Internal Server Error!",
                 status_code=500,
             )
-        elif result is ServiceError.ACCOUNT_EMAIL_NOT_FOUND:
-            return responses.failure(
-                result,
-                "Email not found!",
-                status_code=404,
-            )
+        elif result is None:
+            return responses.success(data=[])
     else:
         return responses.success(result)
 
