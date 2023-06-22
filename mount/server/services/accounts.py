@@ -1,7 +1,7 @@
 from typing import Any, Union
 from uuid import UUID, uuid4
 
-
+from server.utils import security
 from server.utils.errors import ServiceError
 import server.utils.validation as validation
 import server.repositories.accounts as repo
@@ -29,10 +29,11 @@ async def signup(
     if await accounts.fetch_by_username(username=username) is not None:
         return ServiceError.ACCOUNTS_USERNAME_EXISTS
 
+    hashed_password = security.hash_password(password)
     account = await accounts.create(
         account_id=uuid4(),
         email=email_address,
-        password=password,
+        password=hashed_password,
         username=username,
         role=role,
     )
