@@ -25,13 +25,15 @@ def get_status_code(error: ServiceError) -> int:
         return status.HTTP_500_INTERNAL_SERVER_ERROR
 
 
-@router.post("/v1/sessions", response_model=Success[Session])
+@router.post("/sessions", response_model=Success[Session])
 async def login(
     args: LoginForm,
     user_agent: str = Header(...),
 ):
     data = await sessions.login(
-        username=args.username, password=args.password, user_agent=user_agent
+        username=args.username,
+        password=args.password,
+        user_agent=user_agent,
     )
 
     if isinstance(data, ServiceError):
@@ -40,9 +42,9 @@ async def login(
             message="Failed to create session",
             status_code=get_status_code(data),
         )
-    
+
     resp = Session.from_mapping(data)
-    
+
     return success(
         resp,
         status_code=status.HTTP_201_CREATED,
@@ -55,14 +57,15 @@ async def login(
                 "samesite": "lax",
                 "expires": int((data["expires_at"] - datetime.now()).total_seconds()),
             }
-        ]
+        ],
     )
-    
-@router.get("/v1/sessions")
+
+
+@router.get("/sessions")
 async def fetch_many(
     account_id: UUID | None = None,
     user_agent: str | None = None,
-    page: int = 1, 
+    page: int = 1,
     page_size: int = 10,
 ) -> Union[Success[list[Session]], Failure]:
     data = await sessions.fetch_many(
@@ -71,57 +74,52 @@ async def fetch_many(
         page=page,
         page_size=page_size,
     )
-    
+
     if isinstance(data, ServiceError):
         return failure(
             error=data,
             message="Failed to find any sessions",
             status_code=get_status_code(data),
         )
-    
+
     resp = [Session.from_mapping(rec) for rec in data]
     return success(resp)
 
 
-@router.get("/v1/sessions/{session_id}")
-async def fetch_session_by_id(
-    session_id: UUID
-) -> Union[Success[Session], Failure]:
-    data = await sessions.fetch_one(
-        session_id=session_id
-    )
-    
+@router.get("/sessions/{session_id}")
+async def fetch_session_by_id(session_id: UUID) -> Union[Success[Session], Failure]:
+    data = await sessions.fetch_one(session_id=session_id)
+
     if isinstance(data, ServiceError):
         return failure(
             error=data,
             message="Failed to find session!",
             status_code=get_status_code(data),
         )
-    
+
     resp = Session.from_mapping(data)
     return success(resp)
 
-@router.delete("/v1/sessions")
+
+@router.delete("/sessions")
 async def logout(
-    http_credentials: HTTPAuthorizationCredentials | None = Depends(
-        http_scheme
-    ),
+    http_credentials: HTTPAuthorizationCredentials | None = Depends(http_scheme),
 ) -> Union[Success[Session], Failure]:
     if http_credentials is None:
         return failure(
             error=ServiceError.SESSIONS_NOT_FOUND,
             message="Failed to log out of session!",
-            status_code=status.HTTP_403_FORBIDDEN
+            status_code=status.HTTP_403_FORBIDDEN,
         )
-        
+
     data = await sessions.logout(session_id=http_credentials.credentials)
-    
+
     if isinstance(data, ServiceError):
         return failure(
             error=data,
             message="Failed to log out of session!",
-            status_code=get_status_code(data)
+            status_code=get_status_code(data),
         )
-        
+
     resp = Session.from_mapping(data)
     return success(resp, status_code=status.HTTP_200_OK)
