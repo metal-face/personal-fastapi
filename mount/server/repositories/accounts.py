@@ -6,6 +6,7 @@ from server.utils import services
 READ_PARAMS = """\
     account_id,
     username,
+    password,
     email,
     role,
     created_at,
@@ -17,7 +18,7 @@ async def create(
     account_id: UUID,
     username: str,
     email: str,
-    password: str,
+    password: bytes,
     role: str,
 ) -> dict[str, Any]:
     account = await services.database.fetch_one(
@@ -45,7 +46,7 @@ async def fetch_many(
 ) -> list[dict[str, Any]]:
     accounts = await services.database.fetch_all(
         query=f"""
-            SELECT {READ_PARAMS} 
+            SELECT {READ_PARAMS}
             FROM accounts
             WHERE role = COALESCE(:role, role)
             LIMIT :limit
@@ -65,8 +66,8 @@ async def fetch_one(
 ) -> dict[str, Any] | None:
     account = await services.database.fetch_one(
         query=f"""
-            SELECT {READ_PARAMS} 
-            FROM accounts 
+            SELECT {READ_PARAMS}
+            FROM accounts
             WHERE account_id = :account_id
         """,
         values={
