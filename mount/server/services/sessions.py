@@ -5,6 +5,7 @@ from server.utils.errors import ServiceError
 from server.utils.validation import validate_password
 from server.repositories import accounts
 from server.repositories import sessions
+from server.utils import security
 
 
 async def login(
@@ -15,9 +16,13 @@ async def login(
     account = await accounts.fetch_by_username(username)
 
     if account is None:
-        return ServiceError.ACCOUNTS_NOT_FOUND
+        return ServiceError.CREDENTIALS_NOT_FOUND
 
     if not validate_password(password):
+        return ServiceError.CREDENTIALS_INCORRECT
+
+
+    if not security.check_password(password, account["password"]):
         return ServiceError.CREDENTIALS_INCORRECT
 
     session_id = uuid4()
