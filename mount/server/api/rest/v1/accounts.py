@@ -1,3 +1,4 @@
+from datetime import datetime
 from fastapi import APIRouter, Request
 from pydantic import BaseModel
 from server.models.dto.accounts import AccountDTO
@@ -9,8 +10,17 @@ from server.utils.errors import ServiceError
 
 router = APIRouter(tags=["Accounts"])
 
-class emailRequest(BaseModel):
+
+class EmailRequest(BaseModel):
     email: str
+
+
+class Account(BaseModel):
+    account_id: UUID
+    username: str
+    role: str
+    created_at: datetime
+
 
 @router.post("/accounts")
 async def create_account(args: AccountDTO):
@@ -22,13 +32,15 @@ async def create_account(args: AccountDTO):
     )
 
     if isinstance(result, ServiceError):
-        return responses.failure(result, message="Signup Failed!", status_code=404)
+        if result is ServiceError.ACCOUNTS_SIGNUP_FAILED:
+            return responses.failure(result, message="Signup Failed!", status_code=500)
 
-    return responses.success(result)
+    resp = Account.parse_obj(result)
+    return responses.success(resp)
 
 
 @router.post("/search")
-async def fetch_by_email(request: emailRequest):
+async def fetch_by_email(request: EmailRequest):
     result = await accounts.fetch_by_email(request.email)
 
     if isinstance(result, ServiceError):
@@ -41,7 +53,8 @@ async def fetch_by_email(request: emailRequest):
         elif result is None:
             return responses.success(data=[])
     else:
-        return responses.success(result)
+        resp = Account.parse_obj(result)
+        return responses.success(resp)
 
 
 @router.get("/accounts")
@@ -54,7 +67,10 @@ async def fetch_many(page: int = 1, page_size: int = 30):
             status_code=500,
         )
 
-    return None if result is None else result
+    if result is None:
+        return responses.success([])
+
+    return responses.success([Account.parse_obj(account) for account in result])
 
 
 @router.get("/accounts/{id}")
@@ -67,8 +83,8 @@ async def fetch_one(id: UUID):
             message="Account not found!",
             status_code=404,
         )
-
-    return responses.success(result)
+    resp = Account.parse_obj(result)
+    return responses.success(resp)
 
 
 @router.patch("/accounts/{id}")
@@ -100,8 +116,8 @@ async def update_by_id(id: UUID, args: AccountUpdateDTO):
                 message="Account update failed!",
                 status_code=404,
             )
-
-    return responses.success(result)
+    resp = Account.parse_obj(result)
+    return responses.success(resp)
 
 
 @router.delete("/accounts/{id}")
@@ -109,10 +125,12 @@ async def delete_by_id(id: UUID):
     result = await accounts.delete_by_id(id)
 
     if isinstance(result, ServiceError):
-        return responses.failure(
-            result,
-            message="Account deletion failed!",
-            status_code=404,
-        )
+        if result is ServiceError.ACCOUNTS_DELETION_FAILED:
+            return responses.failure(
+                result,
+                message="Account deletion failed!",
+                status_code=500,
+            )
 
-    return responses.success(result)
+    resp = Account.parse_obj(result)
+    return responses.success(resp)
