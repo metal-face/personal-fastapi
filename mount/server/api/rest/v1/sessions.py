@@ -67,7 +67,7 @@ async def fetch_many(
     user_agent: str | None = None,
     page: int = 1,
     page_size: int = 10,
-) -> Union[Success[list[Session]], Failure]:
+) -> Success[list[Session]] | Failure:
     data = await sessions.fetch_many(
         account_id=account_id,
         user_agent=user_agent,
@@ -87,7 +87,7 @@ async def fetch_many(
 
 
 @router.get("/sessions/{session_id}")
-async def fetch_session_by_id(session_id: UUID) -> Union[Success[Session], Failure]:
+async def fetch_session_by_id(session_id: UUID) -> Success[Session] | Failure:
     data = await sessions.fetch_one(session_id=session_id)
 
     if isinstance(data, ServiceError):
@@ -104,7 +104,7 @@ async def fetch_session_by_id(session_id: UUID) -> Union[Success[Session], Failu
 @router.delete("/sessions")
 async def logout(
     http_credentials: HTTPAuthorizationCredentials | None = Depends(http_scheme),
-) -> Union[Success[Session], Failure]:
+) -> Success[Session] | Failure:
     if http_credentials is None:
         return failure(
             error=ServiceError.SESSIONS_NOT_FOUND,
