@@ -1,12 +1,12 @@
-from datetime import datetime
-from fastapi import APIRouter, Request
-from pydantic import BaseModel
-from server.models.dto.accounts import AccountDTO
-from server.services import accounts
 from uuid import UUID
+from datetime import datetime
+from fastapi import APIRouter
+from pydantic import BaseModel
+from server.services import accounts
 from server.api.rest import responses
-from server.models.dto.accounts import AccountUpdateDTO
 from server.utils.errors import ServiceError
+from server.models.dto.accounts import AccountUpdateDTO
+from server.models.dto.accounts import AccountDTO
 
 router = APIRouter(tags=["Accounts"])
 
@@ -50,8 +50,8 @@ async def fetch_by_email(request: EmailRequest):
                 message="Error! Internal Server Error!",
                 status_code=500,
             )
-        elif result is None:
-            return responses.success(data=[])
+    elif result is None:
+        return responses.success(data=[])
     else:
         resp = Account.parse_obj(result)
         return responses.success(resp)
