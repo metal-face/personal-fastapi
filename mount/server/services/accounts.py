@@ -1,11 +1,10 @@
 from typing import Any, Union
 from uuid import UUID, uuid4
-
 from server.utils import security
 from server.utils.errors import ServiceError
+from server.repositories import accounts
 import server.utils.validation as validation
 import server.repositories.accounts as repo
-from server.repositories import accounts
 
 
 async def signup(
