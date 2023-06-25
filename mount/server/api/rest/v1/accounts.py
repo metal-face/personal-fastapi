@@ -34,6 +34,12 @@ async def create_account(args: AccountDTO):
     if isinstance(result, ServiceError):
         if result is ServiceError.ACCOUNTS_SIGNUP_FAILED:
             return responses.failure(result, message="Signup Failed!", status_code=500)
+        else:
+            return responses.failure(
+                result,
+                message="Error! Internal Server Error!",
+                status_code=500,
+            )
 
     resp = Account.parse_obj(result)
     return responses.success(resp)
