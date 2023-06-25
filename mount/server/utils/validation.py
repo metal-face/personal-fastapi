@@ -1,4 +1,5 @@
 import email_validator
+import string
 
 
 def validate_username(username: str) -> bool:
@@ -17,6 +18,9 @@ def validate_password(password: str) -> bool:
         return False
     # Number check
     if not any(char.isdigit() for char in password):
+        return False
+    # Check for special char
+    if not any(char in string.punctuation for char in password):
         return False
 
     return True
