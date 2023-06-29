@@ -11,10 +11,6 @@ from server.models.dto.accounts import AccountDTO
 router = APIRouter(tags=["Accounts"])
 
 
-class EmailRequest(BaseModel):
-    email: str
-
-
 class Account(BaseModel):
     account_id: UUID
     username: str
@@ -43,24 +39,6 @@ async def create_account(args: AccountDTO):
 
     resp = Account.parse_obj(result)
     return responses.success(resp)
-
-
-@router.post("/search")
-async def fetch_by_email(request: EmailRequest):
-    result = await accounts.fetch_by_email(request.email)
-
-    if isinstance(result, ServiceError):
-        if result is ServiceError.DATABASE_QUERY_FAILED:
-            return responses.failure(
-                result,
-                message="Error! Internal Server Error!",
-                status_code=500,
-            )
-    elif result is None:
-        return responses.success(data=[])
-    else:
-        resp = Account.parse_obj(result)
-        return responses.success(resp)
 
 
 @router.get("/accounts")
