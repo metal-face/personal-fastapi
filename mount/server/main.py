@@ -6,6 +6,7 @@ from server.utils import services
 from server.api.rest.v1.sessions import router as sessions_router
 from server.api.rest.v1.accounts import router as accounts_router
 from server.api.rest.v1.blogs import router as blogs_router
+from server.api.rest.v1.search import router as search_router
 from server.utils import settings
 from server.adapters import database
 from aioredis import Redis
@@ -14,6 +15,8 @@ app = FastAPI()
 app.include_router(accounts_router)
 app.include_router(sessions_router)
 app.include_router(blogs_router)
+app.include_router(search_router)
+
 
 origins = [
     "http://localhost:3000",
