@@ -1,7 +1,6 @@
 from typing import Any, TypeVar, TypedDict, Literal, Mapping, Iterable, Generic
 from server.utils.json import OrJSONResponse
 from server.utils.errors import ServiceError
-from pydantic.generics import GenericModel
 from pydantic import BaseModel
 from fastapi import status, Response
 
@@ -38,15 +37,15 @@ def create_response(
     return response
 
 
-class Success(GenericModel, Generic[T]):
+class Success(BaseModel, Generic[T]):
     status: Literal["success"]
     data: T
-    
+
 class Failure(BaseModel):
     status: Literal["failure"]
     error: ServiceError
     message: str
-    
+
 
 def format_success(data: Any) -> dict[str, Any]:
     return {"status": "success", "data": data}
