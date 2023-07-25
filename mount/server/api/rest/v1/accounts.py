@@ -16,10 +16,11 @@ class Account(BaseModel):
     username: str
     role: str
     created_at: datetime
+    token: str
 
 
 @router.post("/accounts")
-async def create_account(args: AccountDTO):
+async def create_account(args: AccountDTO, token: str):
     result = await accounts.signup(
         args.email,
         args.password,
