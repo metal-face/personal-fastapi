@@ -9,3 +9,5 @@ email-validator
 structlog
 fastapi-mail
 bcrypt
+google-recaptcha
+httpx
