@@ -32,3 +32,5 @@ class ServiceError(str, Enum):
     AVATARS_SIZE_TOO_LARGE = "avatars.size_too_large"
 
     DATABASE_QUERY_FAILED = "database.query_failed"
+
+    RECAPTCHA_VERIFICATION_FAILED = "recaptcha.verification_failed"
