@@ -19,3 +19,6 @@ DB_NAME = os.environ["DB_NAME"]
 REDIS_HOST = os.environ["REDIS_HOST"]
 REDIS_PORT = int(os.environ["REDIS_PORT"])
 REDIS_DB = int(os.environ["REDIS_DB"])
+
+RECAPTCHA_SECRET_KEY = str(os.environ["RECAPTCHA_SECRET_KEY"])
+RECAPTCHA_SITE_KEY = str(os.environ["RECAPTCHA_SITE_KEY"])
