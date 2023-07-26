@@ -6,13 +6,20 @@ from server.utils.validation import validate_password
 from server.repositories import accounts
 from server.repositories import sessions
 from server.utils import security
+from server.adapters import recaptcha
 
 
 async def login(
     username: str,
     password: str,
     user_agent: str,
+    token: str,
 ) -> Union[dict[str, Any], ServiceError]:
+    is_human = recaptcha.verify_recaptcha(token)
+
+    if not is_human:
+        return ServiceError.RECAPTCHA_VERIFICATION_FAILED
+
     account = await accounts.fetch_by_username(username)
 
     if account is None:
@@ -20,7 +27,6 @@ async def login(
 
     if not validate_password(password):
         return ServiceError.CREDENTIALS_INCORRECT
-
 
     if not security.check_password(password, account["password"]):
         return ServiceError.CREDENTIALS_INCORRECT
