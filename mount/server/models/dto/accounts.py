@@ -13,6 +13,7 @@ class AccountDTO(BaseModel):
     email: str
     password: str
     role: RoleEnum
+    token: str
 
 
 class AccountUpdateDTO(BaseModel):
