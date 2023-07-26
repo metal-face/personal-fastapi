@@ -20,6 +20,8 @@ def get_status_code(error: ServiceError) -> int:
         return status.HTTP_401_UNAUTHORIZED
     elif error is ServiceError.SESSIONS_NOT_FOUND:
         return status.HTTP_404_NOT_FOUND
+    elif error is ServiceError.RECAPTCHA_VERIFICATION_FAILED:
+        return status.HTTP_400_BAD_REQUEST
     else:
         logger.error("Unhandled service error: ", error=error)
         return status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -33,6 +35,7 @@ async def login(
     data = await sessions.login(
         username=args.username,
         password=args.password,
+        token=args.token,
         user_agent=user_agent,
     )
 
