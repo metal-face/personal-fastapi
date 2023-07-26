@@ -36,6 +36,8 @@ services:
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=${REDIS_PORT}
       - REDIS_DB=${REDIS_DB}
+      - RECAPTCHA_SECRET_KEY=${RECAPTCHA_SECRET_KEY}
+      - RECAPTCHA_SITE_KEY=${RECAPTCHA_SITE_KEY}
       - SERVICE_READINESS_TIMEOUT=${SERVICE_READINESS_TIMEOUT}
     volumes:
       - ./mount:/srv/root
@@ -43,7 +45,7 @@ services:
     depends_on:
       - postgres
       - redis
-      
+
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8080 || exit 1"]
       interval: 30s
