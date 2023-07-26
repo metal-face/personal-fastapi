@@ -16,21 +16,21 @@ class Account(BaseModel):
     username: str
     role: str
     created_at: datetime
-    token: str
 
 
 @router.post("/accounts")
-async def create_account(args: AccountDTO, token: str):
+async def create_account(args: AccountDTO):
     result = await accounts.signup(
-        args.email,
-        args.password,
-        args.username,
-        args.role,
+        args.email, args.password, args.username, args.role, args.token
     )
 
     if isinstance(result, ServiceError):
         if result is ServiceError.ACCOUNTS_SIGNUP_FAILED:
             return responses.failure(result, message="Signup Failed!", status_code=500)
+        elif result is ServiceError.RECAPTCHA_VERIFICATION_FAILED:
+            return responses.failure(
+                result, message="ReCaptcha Authentication Failed!", status_code=400
+            )
         else:
             return responses.failure(
                 result,
@@ -38,7 +38,7 @@ async def create_account(args: AccountDTO, token: str):
                 status_code=500,
             )
 
-    resp = Account.parse_obj(result)
+    resp = Account.model_validate(result)
     return responses.success(resp)
 
 
@@ -55,7 +55,7 @@ async def fetch_many(page: int = 1, page_size: int = 30):
     if result is None:
         return responses.success([])
 
-    return responses.success([Account.parse_obj(account) for account in result])
+    return responses.success([Account.model_validate(account) for account in result])
 
 
 @router.get("/accounts/{id}")
@@ -68,7 +68,7 @@ async def fetch_one(id: UUID):
             message="Account not found!",
             status_code=404,
         )
-    resp = Account.parse_obj(result)
+    resp = Account.model_validate(result)
     return responses.success(resp)
 
 
@@ -101,7 +101,7 @@ async def update_by_id(id: UUID, args: AccountUpdateDTO):
                 message="Account update failed!",
                 status_code=404,
             )
-    resp = Account.parse_obj(result)
+    resp = Account.model_validate(result)
     return responses.success(resp)
 
 
@@ -117,5 +117,5 @@ async def delete_by_id(id: UUID):
                 status_code=500,
             )
 
-    resp = Account.parse_obj(result)
+    resp = Account.model_validate(result)
     return responses.success(resp)
