@@ -5,14 +5,17 @@ from server.utils.errors import ServiceError
 from server.repositories import accounts
 import server.utils.validation as validation
 import server.repositories.accounts as repo
+from server.adapters import recaptcha
 
 
 async def signup(
-    email_address: str,
-    password: str,
-    username: str,
-    role: str,
+    email_address: str, password: str, username: str, role: str, token: str
 ) -> dict[str, Any] | ServiceError:
+    is_human = await recaptcha.verify_recaptcha(token)
+
+    if not is_human:
+        return ServiceError.RECAPTCHA_VERIFICATION_FAILED
+
     if not validation.validate_username(username):
         return ServiceError.ACCOUNTS_USERNAME_INVALID
 
