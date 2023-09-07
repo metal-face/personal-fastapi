@@ -15,7 +15,7 @@ async def login(
     user_agent: str,
     token: str,
 ) -> Union[dict[str, Any], ServiceError]:
-    is_human = recaptcha.verify_recaptcha(token)
+    is_human = await recaptcha.verify_recaptcha(token)
 
     if not is_human:
         return ServiceError.RECAPTCHA_VERIFICATION_FAILED
