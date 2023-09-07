@@ -5,16 +5,21 @@ from server.models.dto.blog import BlogUpdateDTO
 from server.services import blogs
 from server.api.rest import responses
 from server.utils.errors import ServiceError
+from fastapi import Depends
+from server.api.rest.authorization import HTTPBearer, HTTPAuthorizationCredentials
+
 
 router = APIRouter(tags=["Blogs"])
+http_scheme = HTTPBearer(auto_error=True)
 
 
 @router.post("/blogs")
-async def create_post(args: BlogDTO):
+async def create_post(
+    args: BlogDTO,
+    http_credentials: HTTPAuthorizationCredentials | None = (Depends(http_scheme),),
+):
     result = await blogs.create_post(
-        args.account_id,
-        args.blog_post,
-        args.blog_title,
+        args.account_id, args.blog_post, args.blog_title, http_credentials.credentials
     )
 
     if isinstance(result, ServiceError):
@@ -75,8 +80,14 @@ async def update_by_id(
 
 
 @router.delete("/blogs/{blog_id}")
-async def delete_by_id(blog_id: UUID):
-    result = await blogs.delete_by_id(blog_id)
+async def delete_by_id(
+    blog_id: UUID,
+    http_credentials: HTTPAuthorizationCredentials | None = Depends(http_scheme),
+):
+    result = await blogs.delete_by_id(
+        blog_id,
+        http_credentials.credentials,
+    )
 
     if isinstance(result, ServiceError):
         return responses.failure(

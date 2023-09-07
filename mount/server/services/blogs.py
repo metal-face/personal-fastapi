@@ -5,14 +5,20 @@ from server.utils.errors import ServiceError
 import server.utils.validation as validation
 import server.repositories.accounts as repo
 from server.repositories import blogs
-from server.repositories.sessions import sessions
+from server.repositories import sessions
 
 
 async def create_post(
     account_id: UUID,
     blog_post: str,
     blog_title: str,
+    session_id: UUID,
 ) -> Union[dict[str, Any], ServiceError]:
+    session = await sessions.fetch_one(session_id)
+
+    if session is None:
+        return ServiceError.SESSIONS_NOT_FOUND
+
     if len(blog_post) < 100 or len(blog_post) > 200_000:
         return ServiceError.BLOG_POST_INCORRECT_LENGTH
 
@@ -80,7 +86,14 @@ async def update_by_id(
     return blog
 
 
-async def delete_by_id(blog_id: UUID) -> Union[dict[str, Any], ServiceError]:
+async def delete_by_id(
+    blog_id: UUID, session_id: UUID
+) -> Union[dict[str, Any], ServiceError]:
+    session = await sessions.fetch_one(session_id)
+
+    if session is None:
+        return ServiceError.SESSIONS_NOT_FOUND
+
     blog = await blogs.delete_by_id(blog_id)
 
     if blog is None:
