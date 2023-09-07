@@ -56,11 +56,16 @@ async def fetch_one(blog_id: UUID):
 
 
 @router.patch("/blogs/{blog_id}")
-async def update_by_id(blog_id: UUID, args: BlogUpdateDTO):
+async def update_by_id(
+    blog_id: UUID,
+    args: BlogUpdateDTO,
+    http_credentials: HTTPAuthorizationCredentials | None = Depends(http_scheme),
+):
     result = await blogs.update_by_id(
         blog_id=blog_id,
         blog_post=args.blog_post,
         blog_title=args.blog_title,
+        session_id=http_credentials.credentials,
     )
 
     if isinstance(result, ServiceError):

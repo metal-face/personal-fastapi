@@ -5,6 +5,7 @@ from server.utils.errors import ServiceError
 import server.utils.validation as validation
 import server.repositories.accounts as repo
 from server.repositories import blogs
+from server.repositories.sessions import sessions
 
 
 async def create_post(
@@ -50,9 +51,15 @@ async def fetch_many(
 
 async def update_by_id(
     blog_id: UUID,
+    session_id: UUID,
     blog_post: str | None,
     blog_title: str | None,
 ) -> Union[dict[str, Any], ServiceError]:
+    session = await sessions.fetch_one(session_id)
+
+    if session is None:
+        return ServiceError.SESSIONS_NOT_FOUND
+
     if blog_post is not None:
         if len(blog_post) < 100 or len(blog_post) > 200_000:
             return ServiceError.BLOG_POST_INCORRECT_LENGTH
