@@ -16,7 +16,7 @@ http_scheme = HTTPBearer(auto_error=True)
 @router.post("/blogs")
 async def create_post(
     args: BlogDTO,
-    http_credentials: HTTPAuthorizationCredentials | None = (Depends(http_scheme),),
+    http_credentials: HTTPAuthorizationCredentials | None = Depends(http_scheme),
 ):
     result = await blogs.create_post(
         args.account_id, args.blog_post, args.blog_title, http_credentials.credentials
