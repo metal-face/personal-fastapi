@@ -21,6 +21,7 @@ app.include_router(search_router)
 origins = [
     "http://localhost:3000",
     "http://localhost:10000",
+    "https://metalface.ca",
 ]
 
 app.add_middleware(
