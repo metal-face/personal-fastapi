@@ -22,6 +22,8 @@ origins = [
     "http://localhost:3000",
     "http://localhost:10000",
     "https://metalface.ca",
+    "https://metalface.ca/",
+    "https://api.metalface.ca",
 ]
 
 app.add_middleware(
