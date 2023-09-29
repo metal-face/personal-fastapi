@@ -7,6 +7,7 @@ from server.api.rest import responses
 from server.utils.errors import ServiceError
 from server.models.dto.accounts import AccountUpdateDTO
 from server.models.dto.accounts import AccountDTO
+from fastapi import status
 
 router = APIRouter(tags=["Accounts"])
 
@@ -18,6 +19,28 @@ class Account(BaseModel):
     created_at: datetime
 
 
+def determine_status_code(error: ServiceError) -> int:
+    match error:
+        case ServiceError.ACCOUNTS_EMAIL_ADDRESS_INVALID:
+            return status.HTTP_422_UNPROCESSABLE_ENTITY
+        case ServiceError.ACCOUNTS_PASSWORD_INVALID:
+            return status.HTTP_422_UNPROCESSABLE_ENTITY
+        case ServiceError.ACCOUNTS_USERNAME_INVALID:
+            return status.HTTP_422_UNPROCESSABLE_ENTITY
+        case ServiceError.ACCOUNTS_USERNAME_EXISTS:
+            return status.HTTP_409_CONFLICT
+        case ServiceError.ACCOUNTS_EMAIL_ADDRESS_EXISTS:
+            return status.HTTP_409_CONFLICT
+        case ServiceError.ACCOUNTS_NOT_FOUND:
+            return status.HTTP_404_NOT_FOUND
+        case ServiceError.RECAPTCHA_VERIFICATION_FAILED:
+            return status.HTTP_400_BAD_REQUEST
+        case ServiceError.INTERNAL_SERVER_ERROR:
+            return status.HTTP_500_INTERNAL_SERVER_ERROR
+        case _:
+            return status.HTTP_500_INTERNAL_SERVER_ERROR
+
+
 @router.post("/accounts")
 async def create_account(args: AccountDTO):
     result = await accounts.signup(
@@ -25,17 +48,42 @@ async def create_account(args: AccountDTO):
     )
 
     if isinstance(result, ServiceError):
+        status_code = determine_status_code(result)
         if result is ServiceError.ACCOUNTS_SIGNUP_FAILED:
-            return responses.failure(result, message="Signup Failed!", status_code=500)
+            return responses.failure(
+                result, message="Signup Failed!", status_code=status_code
+            )
+        elif result is ServiceError.ACCOUNTS_PASSWORD_INVALID:
+            return responses.failure(
+                result, message="Password Invalid!", status_code=status_code
+            )
+        elif result is ServiceError.ACCOUNTS_EMAIL_ADDRESS_INVALID:
+            return responses.failure(
+                result, message="Email Invalid!", status_code=status_code
+            )
+        elif result is ServiceError.ACCOUNTS_USERNAME_INVALID:
+            return responses.failure(
+                result, message="Username Invalid!", status_code=status_code
+            )
+        elif result in ServiceError.ACCOUNTS_USERNAME_EXISTS:
+            return responses.failure(
+                result, message="Username exists!", status_code=status_code
+            )
+        elif result in ServiceError.ACCOUNTS_EMAIL_ADDRESS_EXISTS:
+            return responses.failure(
+                result, message="Email already exists!", status_code=status_code
+            )
         elif result is ServiceError.RECAPTCHA_VERIFICATION_FAILED:
             return responses.failure(
-                result, message="ReCaptcha Authentication Failed!", status_code=400
+                result,
+                message="ReCaptcha Authentication Failed!",
+                status_code=status_code,
             )
         else:
             return responses.failure(
                 result,
                 message="Error! Internal Server Error!",
-                status_code=500,
+                status_code=status_code,
             )
 
     resp = Account.model_validate(result)
