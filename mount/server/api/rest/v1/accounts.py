@@ -94,10 +94,11 @@ async def create_account(args: AccountDTO):
 async def fetch_many(page: int = 1, page_size: int = 30):
     result = await accounts.fetch_many(page, page_size)
     if isinstance(result, ServiceError):
+        status_code = determine_status_code(result)
         return responses.failure(
             result,
             message="Error! Internal Server Error!",
-            status_code=500,
+            status_code=status_code,
         )
 
     if result is None:
@@ -131,23 +132,24 @@ async def update_by_id(id: UUID, args: AccountUpdateDTO):
     )
 
     if isinstance(result, ServiceError):
+        status_code = determine_status_code(result)
         if result == ServiceError.ACCOUNTS_EMAIL_ADDRESS_EXISTS:
             return responses.failure(
                 result,
                 message="An account with this email already exists!",
-                status_code=409,
+                status_code=status_code,
             )
         elif result == ServiceError.ACCOUNTS_USERNAME_EXISTS:
             return responses.failure(
                 result,
                 message="An account with this username already exists!",
-                status_code=409,
+                status_code=status_code,
             )
         else:
             return responses.failure(
                 result,
                 message="Account update failed!",
-                status_code=404,
+                status_code=status_code,
             )
     resp = Account.model_validate(result)
     return responses.success(resp)
