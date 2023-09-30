@@ -39,6 +39,18 @@ async def create(
     return dict(account._mapping)
 
 
+async def fetch_total_count() -> int:
+    count = await services.database.fetch_one(
+        query=f"""\
+            SELECT COUNT(*) AS count
+            FROM accounts
+        """,
+        values={},
+    )
+    assert count is not None
+    return count["count"]
+
+
 async def fetch_many(
     page: int,
     page_size: int,

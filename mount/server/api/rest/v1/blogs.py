@@ -47,7 +47,19 @@ async def fetch_many(
     if isinstance(result, ServiceError):
         return responses.failure(result, message="No Blogs Found!", status_code=404)
 
-    return responses.success(result)
+    total = await blogs.fetch_total_count()
+    if isinstance(total, ServiceError):
+        return responses.failure(
+            total,
+            message="Error! Internal Server Error!",
+            status_code=500,
+        )
+
+    return responses.success(
+        data=result,
+        status_code=200,
+        meta={"page": page, "page_size": page_size, "total": total},
+    )
 
 
 @router.get("/blogs/{blog_id}")

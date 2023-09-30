@@ -55,6 +55,16 @@ async def fetch_many(
     return blog_posts
 
 
+async def fetch_total_count() -> int | ServiceError:
+    try:
+        total_count = await blogs.fetch_total_count()
+    except Exception as e:
+        print(e)
+        return ServiceError.DATABASE_QUERY_FAILED
+
+    return total_count
+
+
 async def update_by_id(
     blog_id: UUID,
     session_id: UUID,

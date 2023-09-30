@@ -26,7 +26,11 @@ def create_response(
     headers: dict[str, str] | None,
     cookies: Iterable[Cookie] | None = None,
 ) -> OrJSONResponse:
-    response = OrJSONResponse(content, status_code, headers)
+    response = OrJSONResponse(
+        content,
+        status_code,
+        headers,
+    )
 
     if cookies is None:
         cookies = []
@@ -41,23 +45,30 @@ class Success(BaseModel, Generic[T]):
     status: Literal["success"]
     data: T
 
+
 class Failure(BaseModel):
     status: Literal["failure"]
     error: ServiceError
     message: str
 
 
-def format_success(data: Any) -> dict[str, Any]:
-    return {"status": "success", "data": data}
+def format_success(
+    data: Any,
+    meta: dict[str, Any] | None,
+) -> dict[str, Any]:
+    return {"status": "success", "data": data, "meta": meta}
 
 
 def success(
     data: Any,
     status_code: int = 200,
     headers: dict | None = None,
+    meta: dict[str, Any] | None = None,
     cookies: Iterable[Cookie] | None = None,
 ) -> Any:
-    content = format_success(data)
+    if meta is None:
+        meta = {}
+    content = format_success(data, meta)
     return create_response(content, status_code, headers, cookies)
 
 
@@ -74,6 +85,7 @@ def failure(
 ) -> Any:
     content = format_failure(error, message)
     return create_response(content, status_code, headers, cookies)
+
 
 def no_content(headers: dict[str, Any] | None = None) -> Response:
     return Response(status_code=status.HTTP_204_NO_CONTENT, headers=headers)

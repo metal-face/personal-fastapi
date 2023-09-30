@@ -102,9 +102,34 @@ async def fetch_many(page: int = 1, page_size: int = 30):
         )
 
     if result is None:
-        return responses.success([])
+        return responses.success(
+            [],
+            200,
+            meta={
+                "page": page,
+                "page_size": page_size,
+                "total": 0,
+            },
+        )
 
-    return responses.success([Account.model_validate(account) for account in result])
+    total = await accounts.fetch_total_count()
+    if isinstance(total, ServiceError):
+        status_code = determine_status_code(total)
+        return responses.failure(
+            total,
+            message="Error! Internal Server Error!",
+            status_code=status_code,
+        )
+
+    return responses.success(
+        data=[Account.model_validate(account) for account in result],
+        status_code=200,
+        meta={
+            "page": page,
+            "page_size": page_size,
+            "total": total,
+        },
+    )
 
 
 @router.get("/accounts/{id}")

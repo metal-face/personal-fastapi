@@ -51,6 +51,18 @@ async def fetch_many(
     return [dict(blog._mapping) for blog in blogs]
 
 
+async def fetch_total_count() -> int:
+    count = await services.database.fetch_one(
+        query=f"""\
+            SELECT COUNT(*) AS count
+            FROM blogs
+        """,
+        values={},
+    )
+    assert count is not None
+    return count["count"]
+
+
 # TODO: Figure out why it's returning nothing.
 async def fetch_one(blog_id: UUID) -> Union[dict[str, Any], None]:
     blog = await services.database.fetch_one(

@@ -4,7 +4,6 @@ from server.utils import security
 from server.utils.errors import ServiceError
 from server.repositories import accounts
 import server.utils.validation as validation
-import server.repositories.accounts as repo
 from server.adapters import recaptcha
 
 
@@ -89,6 +88,16 @@ async def fetch_many(
         )
     except Exception:
         return ServiceError.DATABASE_QUERY_FAILED
+
+
+async def fetch_total_count() -> int | ServiceError:
+    try:
+        total_count = await accounts.fetch_total_count()
+    except Exception as e:
+        print(e)
+        return ServiceError.DATABASE_QUERY_FAILED
+
+    return total_count
 
 
 async def update_by_id(
